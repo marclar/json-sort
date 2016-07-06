@@ -22,30 +22,44 @@ function sortObject(obj) {
 }
 
 (function () {
-  var save = require('fs').writeFileSync
-  var pkgPath = process.cwd() + '/package.json'
-  var pkg = require(pkgPath)
 
-  if (pkg.dependencies) {
-    console.log(' > Sorting dependencies...')
-    pkg.dependencies = sortObject(pkg.dependencies)
-    console.log(JSON.stringify(pkg.dependencies, null, '  '))
+
+  if(process.argv.length < 3){
+    console.error('Must include a filename to sort');
+  }
+  else {
+    var filename = process.argv[2];
+    if(filename.substr(-5) !== '.json'){
+      filename = filename + '.json';
+    }
+
+    var save = require('fs').writeFileSync
+    var pkgPath = process.cwd() + '/' + filename;
+    var pkg = require(pkgPath)
+
+    if (pkg.dependencies) {
+      console.log(' > Sorting dependencies...')
+      pkg.dependencies = sortObject(pkg.dependencies)
+      console.log(JSON.stringify(pkg.dependencies, null, '  '))
+    }
+
+    if (pkg.devDependencies) {
+      console.log(' > Sorting devDependencies...')
+      pkg.devDependencies = sortObject(pkg.devDependencies)
+      console.log(JSON.stringify(pkg.devDependencies, null, '  '))
+    }
+
+    if (pkg.optionalDependencies) {
+      console.log(' > Sorting optionalDependencies...')
+      pkg.optionalDependencies = sortObject(pkg.optionalDependencies)
+      console.log(JSON.stringify(pkg.optionalDependencies, null, '  '))
+    }
+
+    console.log(' > Writing package.json...')
+    save(pkgPath, JSON.stringify(pkg, null, '  '))
+
+    console.log(' > Done')
+
   }
 
-  if (pkg.devDependencies) {
-    console.log(' > Sorting devDependencies...')
-    pkg.devDependencies = sortObject(pkg.devDependencies)
-    console.log(JSON.stringify(pkg.devDependencies, null, '  '))
-  }
-
-  if (pkg.optionalDependencies) {
-    console.log(' > Sorting optionalDependencies...')
-    pkg.optionalDependencies = sortObject(pkg.optionalDependencies)
-    console.log(JSON.stringify(pkg.optionalDependencies, null, '  '))
-  }
-
-  console.log(' > Writing package.json...')
-  save(pkgPath, JSON.stringify(pkg, null, '  '))
-
-  console.log(' > Done')
 })()
